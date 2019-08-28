@@ -1,0 +1,2 @@
+# locked
+Visual Novel Game
