@@ -33,4 +33,20 @@ public class CharacterManager : MonoBehaviour {
 
         return newCharacter;
     }
+	
+	public void HideCharacter(string characterName)
+	{
+		Character _c = null;
+		foreach(var c in characters)
+		{
+			if(c.characterName == characterName)
+			{
+				_c = c;
+				break;
+			}
+		}
+		characters.Remove(_c);
+		Destroy(GameObject.Find(characterName + "(Clone)"));
+		
+	}
 }
