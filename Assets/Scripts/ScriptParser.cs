@@ -25,6 +25,8 @@ public class ScriptParser : MonoBehaviour {
 	public GameObject BGGameObject; //новый фон
 	public GameObject TextGameObject; //текстовое поле
 	public GameObject ChoosingGameObject; //кнопки
+	AudioSource music;
+	AudioSource sound;
 	
     private void Awake()
     {
@@ -37,6 +39,8 @@ public class ScriptParser : MonoBehaviour {
                 textArray[i] = null;
             }
         }
+		music = transform.GetChild(0).GetComponent<AudioSource>();
+		sound = transform.GetChild(1).GetComponent<AudioSource>();
     } 
 	
 	void Start()
@@ -141,6 +145,18 @@ public class ScriptParser : MonoBehaviour {
 					string bg = tempStrArray[1];
 					GameObject b = Instantiate(BGGameObject);
 					b.GetComponent<Background>().SetImage(bg);
+				}
+				else if(line.StartsWith("@Music"))
+				{
+					tempStrArray = line.Split(' ');
+					music.clip = Resources.Load<AudioClip>("Music/" + tempStrArray[1]);
+					music.Play();
+				}
+				else if(line.StartsWith("@Sound"))
+				{
+					tempStrArray = line.Split(' ');
+					AudioClip a = Resources.Load<AudioClip>("Sounds/" + tempStrArray[1]);
+					sound.PlayOneShot(a, 1);
 				}
 				else if(line.StartsWith("@choosing"))
 				{
