@@ -101,6 +101,9 @@ public class ScriptParser : MonoBehaviour {
         else if (lineNum < textArray.Length && !stopInput)
         {
             line = textArray[lineNum];
+			//Из-за корявого разделения (не знаю с чем связано) убираю последний символ в строке
+			line = line.Substring(0, line.Length - 1);
+			
             while ((line == null) && (lineNum < textArray.Length - 1))
             {
                 Debug.Log(null);
@@ -141,6 +144,7 @@ public class ScriptParser : MonoBehaviour {
 				}
 				else if(line.StartsWith("@bg"))
 				{
+					Debug.Log(line + " - " + line.Length);
 					tempStrArray = line.Split(' ');
 					string bg = tempStrArray[1];
 					GameObject b = Instantiate(BGGameObject);
