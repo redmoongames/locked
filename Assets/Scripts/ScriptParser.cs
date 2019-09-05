@@ -159,14 +159,14 @@ public class ScriptParser : MonoBehaviour {
         characterName.Trim();
 		additiveSpeech[processed].TrimStart();
 		DialogueSystem.instance.Say(additiveSpeech[processed], characterName, (processed != 0));
-		processed++;
+		processed = 0;
 	}
 
     private void Update()
     {
-        if (waitingForInput)
+        if (waitingForInput && !stopInput)
         {
-            additiveSpeech = speechText.Split(new string[] { "&&" }, StringSplitOptions.None); 
+            //additiveSpeech = speechText.Split(new string[] { "&&" }, StringSplitOptions.None); 
             characterName.Trim();
             if (Input.GetMouseButtonDown(0))
             {
@@ -176,15 +176,21 @@ public class ScriptParser : MonoBehaviour {
                 }
                 else
                 {
-                    additiveSpeech[processed].TrimStart();
-                    DialogueSystem.instance.Say(additiveSpeech[processed], characterName, (processed != 0));
-                    processed++;
+					Debug.Log(processed + " - " + additiveSpeech.Length);
+					if (processed == additiveSpeech.Length - 1)
+					{
+						lineNum++;
+						waitingForInput = false;
+					}
+					else
+					{
+						Debug.Log(processed + " - " + additiveSpeech.Length);
+						processed++;
+						additiveSpeech[processed].TrimStart();
+						DialogueSystem.instance.Say(additiveSpeech[processed], characterName, (processed != 0));
+					}
                 }
-            }
-            if (processed == additiveSpeech.Length)
-            {
-                lineNum++;
-                waitingForInput = false;
+				
             }
         }
         else if (lineNum < textArray.Length && !stopInput)
@@ -301,6 +307,9 @@ public class ScriptParser : MonoBehaviour {
                     speechText = tempStrArray[1].Trim();
                     processed = 0;
                     waitingForInput = true;
+					additiveSpeech = speechText.Split(new string[] { "&&" }, StringSplitOptions.None); 
+					additiveSpeech[processed].TrimStart();
+					DialogueSystem.instance.Say(additiveSpeech[processed], characterName, (processed != 0));
                 } else {
                     Debug.Log("line: \"" + line + "\"");
                     Debug.Log(line == null);
@@ -371,6 +380,7 @@ public class ScriptParser : MonoBehaviour {
 			ChoosingGameObject.SetActive(false);
 			stopInput = false;
 		}
+		processed = 0;
 	}
 	
 	public void PressButtonArt()
@@ -379,5 +389,6 @@ public class ScriptParser : MonoBehaviour {
 		ArtGameObject.SetActive(false);
 		TextGameObject.SetActive(true);
 		stopInput = false;
+		processed = 0;
 	}
 }
