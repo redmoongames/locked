@@ -25,6 +25,7 @@ public class ScriptParser : MonoBehaviour {
 	public GameObject BGGameObject; //новый фон
 	public GameObject TextGameObject; //текстовое поле
 	public GameObject ChoosingGameObject; //кнопки
+	public GameObject ArtGameObject; //арт
 	AudioSource music;
 	AudioSource sound;
 	
@@ -49,6 +50,94 @@ public class ScriptParser : MonoBehaviour {
 		line = textArray[lineNum];
 		while ((lineNum < textArray.Length - 1) && (line == null || line.StartsWith("@")))
 		{
+			if ((line != null) && line.StartsWith("@"))
+            {
+				if(line.Length > 1) line = line.Substring(0, line.Length - 1);
+                if (line.StartsWith("@MoveTo") || line.StartsWith("@Show"))
+                {
+                    tempStrArray = line.Split(' ');
+                    Character targetCharacter = CharacterManager.instance.GetCharacter(tempStrArray[1]);
+
+                    if (line.StartsWith("@MoveTo"))
+                    {
+                        
+                        Vector2 targetVector;
+                        targetVector.x = (float)Convert.ToDouble(tempStrArray[2]);
+                        targetVector.y = (float)Convert.ToDouble(tempStrArray[3]);
+                        targetCharacter.MoveTo(targetVector, 1);
+                    }
+                    else if (line.StartsWith("@Show"))
+                    {
+                        string body = tempStrArray[2];
+                        targetCharacter.SetBody(tempStrArray[2]);
+                        //targetCharacter.SetExpression(tempStrArray[3]);
+                    }
+                }
+				else if(line.StartsWith("@hide"))
+				{
+					tempStrArray = line.Split(' ');
+					string person = tempStrArray[1];
+					CharacterManager.instance.HideCharacter(person);
+				}
+				else if(line.StartsWith("@bg"))
+				{
+					Debug.Log(line + " - " + line.Length);
+					tempStrArray = line.Split(' ');
+					string bg = tempStrArray[1];
+					GameObject b = Instantiate(BGGameObject);
+					b.GetComponent<Background>().SetImage(bg);
+				}
+				else if(line.StartsWith("@Music"))
+				{
+					tempStrArray = line.Split(' ');
+					music.clip = Resources.Load<AudioClip>("Music/" + tempStrArray[1]);
+					music.Play();
+				}
+				else if(line.StartsWith("@Sound"))
+				{
+					tempStrArray = line.Split(' ');
+					AudioClip a = Resources.Load<AudioClip>("Sounds/" + tempStrArray[1]);
+					sound.PlayOneShot(a, 1);
+				}
+				else if(line.StartsWith("@choosing"))
+				{
+					stopInput = true;
+					tempStrArray = line.Split(' ');
+					TextGameObject.SetActive(false);
+					ChoosingGameObject.SetActive(true);
+					int countActive = int.Parse(tempStrArray[1]);
+					for(int i = 0; i < countActive; ++i)
+					{
+						ChoosingGameObject.transform.GetChild(i).gameObject.SetActive(true);
+						//Это условие дополню еще попозже
+						if(int.Parse(tempStrArray[2 + i]) != 0) ChoosingGameObject.transform.GetChild(i).GetComponent<UnityEngine.UI.Image>().color = new Color(0,0,0,1);
+						ChoosingGameObject.transform.GetChild(i).GetChild(0).GetComponent<UnityEngine.UI.Text>().text = tempStrArray[2 + countActive + i];
+					}
+					for(int i = countActive; i < 3; ++i)
+					{
+						ChoosingGameObject.transform.GetChild(i).gameObject.SetActive(false);
+					}
+					lineNum--;
+				}
+				else if(line.StartsWith("@jump"))
+				{
+					while (line == null || !line.StartsWith("@metka"))
+					{
+						lineNum++;
+						line = textArray[lineNum];
+					}
+				}
+				else if(line.StartsWith("@art"))
+				{
+					ArtGameObject.SetActive(true);
+					TextGameObject.SetActive(false);
+					stopInput = true;
+				}
+                else
+                {
+                    Debug.Log("Такой команды не существует: " + line);
+                }
+            }
 			lineNum++;
 			line = textArray[lineNum];
 		}
@@ -101,9 +190,7 @@ public class ScriptParser : MonoBehaviour {
         else if (lineNum < textArray.Length && !stopInput)
         {
             line = textArray[lineNum];
-			//Из-за корявого разделения (не знаю с чем связано) убираю последний символ в строке
-			line = line.Substring(0, line.Length - 1);
-			
+	
             while ((line == null) && (lineNum < textArray.Length - 1))
             {
                 Debug.Log(null);
@@ -111,6 +198,9 @@ public class ScriptParser : MonoBehaviour {
                 line = textArray[lineNum];
             }
             line.Trim();
+			
+			//Из-за корявого разделения (не знаю с чем связано) убираю последний символ в строке
+			if(line.Length > 1) line = line.Substring(0, line.Length - 1);
 
             if (line.StartsWith("@"))
             {
@@ -189,6 +279,12 @@ public class ScriptParser : MonoBehaviour {
 						lineNum++;
 						line = textArray[lineNum];
 					}
+				}
+				else if(line.StartsWith("@art"))
+				{
+					ArtGameObject.SetActive(true);
+					TextGameObject.SetActive(false);
+					stopInput = true;
 				}
                 else
                 {
@@ -275,5 +371,13 @@ public class ScriptParser : MonoBehaviour {
 			ChoosingGameObject.SetActive(false);
 			stopInput = false;
 		}
+	}
+	
+	public void PressButtonArt()
+	{
+		lineNum++;
+		ArtGameObject.SetActive(false);
+		TextGameObject.SetActive(true);
+		stopInput = false;
 	}
 }
