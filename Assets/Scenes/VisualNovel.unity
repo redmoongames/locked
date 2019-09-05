@@ -1267,6 +1267,7 @@ MonoBehaviour:
     type: 3}
   TextGameObject: {fileID: 354211563}
   ChoosingGameObject: {fileID: 141449821}
+  ArtGameObject: {fileID: 0}
 --- !u!4 &1332316121
 Transform:
   m_ObjectHideFlags: 0

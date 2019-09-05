@@ -76,6 +76,7 @@ public class Character {
     public Character(string name) {
         Debug.Log("char constructor");
         CharacterManager cm = CharacterManager.instance;
+        Debug.Log(Resources.Load(@"Prefabs/VN Characters/" + name).name);
         GameObject characterPref = Resources.Load(@"Prefabs/VN Characters/" + name) as GameObject;
         GameObject characterObj = GameObject.Instantiate(characterPref, cm.characterPanel);
 
